@@ -30,10 +30,6 @@ url_continuacio<-'home_parcial53b0333c491f039c667746e0eed80262918dadc7.html'
 
 ###Proposta de canvis
 
-
-
-Creem funcions auxiliars que facilitaran la lectura del codi.
-
 ```{r}
 #read_link: accedeix als enllaços
 read_link <- function(x) {
@@ -42,12 +38,14 @@ read_link <- function(x) {
 
 #get_list_nodes: si els enllaços contenen més llistes, en retorna els nodes
 get_list_nodes <- function(x) {
-  x %>% html_nodes(css = "li[style='list-style-image: none; list-style-type: none;']")
+  x %>% html_nodes(xpath= '//ul[@id="tree1"]//a')
 }
 
 #get_links: retorna els enllaços dels nodes
 get_links <- function(x) {
-  url_continuacio<-x %>% html_nodes('a') %>% html_attr('href')
+  url_continuacio<- x %>% html_attr('href')
+  url_continuacio<-url_continuacio[which(grepl('jrubik',url_continuacio))]
+  
   links<-paste(url_base,url_continuacio,sep='')
   return(links)
 }
@@ -75,7 +73,22 @@ get_names <- function(x){
   
   return(paste(pestanya,nom_taula,sep='||'))
 }
+
+#extreu en una llista de vectors que contenen (1) el nom de pestanya i (2) el nom de la taula
+return_names <- function(x) {
+  str_split(x,'\\|\\|')
+}
 ```
+
+```{r}
+link<-c(paste(url_base,url_continuacio,sep=''))
+taules<-list()
+
+rlink<-link %>% read_link
+list_nodes <- rlink %>% get_list_nodes
+links<- list_nodes %>% get_links
+```
+
 
 ```{r}
 #links: Vector d'enllaços. Poden conduir a pàgines amb més enllaços o a una taula final.
